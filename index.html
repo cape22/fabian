@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asisten Pribadi Siswa - Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0b1120',    /* Deep Dark Slate */
+                        accent: '#3b82f6',     /* Vibrant Slate Blue */
+                        success: '#10b981',    /* Electric Emerald Green */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0b1120; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0b1120; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+        /* Liquid Glass Effect */
+        .liquid-glass {
+            background: rgba(11, 17, 32, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row relative">
+
+    <!-- Mobile Header & Hamburger Button -->
+    <div class="md:hidden flex items-center justify-between bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-40">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center font-bold text-white text-sm">AS</div>
+            <h1 class="font-bold text-white text-sm">Asisten Fabian</h1>
+        </div>
+        <button onclick="toggleMobileMenu()" class="text-white p-2 rounded-lg bg-slate-800 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Overlay Backdrop untuk Mobile Menu -->
+    <div id="menu-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar-nav" class="fixed inset-y-0 left-0 z-50 w-7/12 sm:w-1/2 md:w-64 liquid-glass md:bg-slate-900 md:border-r md:border-slate-800 flex flex-col justify-between p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <div>
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-accent flex items-center justify-center font-bold text-white text-xl">AF</div>
+                    <div>
+                        <h1 class="font-bold text-white text-base">Asisten Fabian</h1>
+                        <p class="text-xs text-slate-400">SMAN 2 Cikampek</p>
+                    </div>
+                </div>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-400 hover:text-white p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="space-y-2">
+                <button onclick="switchTab('dashboard'); toggleMobileMenu(true);" id="nav-dashboard" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition bg-accent text-white">
+                    <span>📊</span><span>Ringkasan</span>
+                </button>
+                <button onclick="switchTab('tugas'); toggleMobileMenu(true);" id="nav-tugas" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <span>📚</span><span>Tugas Sekolah</span>
+                </button>
+                <button onclick="switchTab('jadwal'); toggleMobileMenu(true);" id="nav-jadwal" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <span>📅</span><span>Jadwal Pelajaran</span>
+                </button>
+                <button onclick="switchTab('piket'); toggleMobileMenu(true);" id="nav-piket" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <span>🧹</span><span>Jadwal Piket</span>
+                </button>
+                <button onclick="switchTab('kebiasaan'); toggleMobileMenu(true);" id="nav-kebiasaan" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <span>✨</span><span>Rutinitas / Kebiasaan</span>
+                </button>
+                <button onclick="switchTab('keuangan'); toggleMobileMenu(true);" id="nav-keuangan" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <span>💰</span><span>Keuangan</span>
+                </button>
+                <button onclick="switchTab('catatan'); toggleMobileMenu(true);" id="nav-catatan" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <span>📝</span><span>Catatan & Todo</span>
+                </button>
+            </nav>
+        </div>
+        <div class="pt-6 border-t border-slate-800 text-xs text-slate-500 text-center">
+            Terhubung ke Google Sheets &bull; <button onclick="loadAllDataFromSheet()" class="text-accent underline hover:text-blue-400">Sync Data</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto custom-scrollbar md:ml-64">
+        
+        <!-- Top Bar Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b border-slate-800 gap-4">
+            <div>
+                <h2 id="page-title" class="text-2xl font-bold text-white">Ringkasan Utama</h2>
+                <p id="current-date" class="text-sm text-slate-400">Memuat tanggal...</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="sync-status" class="text-xs bg-slate-900 px-3 py-1.5 rounded-full text-success border border-slate-800 flex items-center space-x-1 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                    <span>Siap Sinkron</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- TAB: DASHBOARD / RINGKASAN -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div onclick="switchTab('keuangan')" class="bg-slate-900 border border-slate-800 p-5 rounded-xl cursor-pointer hover:border-accent transition group shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-slate-400 font-medium">Total Saldo Keuangan</span>
+                        <span class="text-accent text-xs opacity-0 group-hover:opacity-100 transition">Buka &rarr;</span>
+                    </div>
+                    <h3 id="dash-saldo" class="text-2xl font-bold text-success">Rp 0</h3>
+                </div>
+                <div onclick="switchTab('tugas')" class="bg-slate-900 border border-slate-800 p-5 rounded-xl cursor-pointer hover:border-accent transition group shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-slate-400 font-medium">Tugas Belum Selesai</span>
+                        <span class="text-accent text-xs opacity-0 group-hover:opacity-100 transition">Buka &rarr;</span>
+                    </div>
+                    <h3 id="dash-tugas" class="text-2xl font-bold text-accent">0 Tugas</h3>
+                </div>
+                <div onclick="switchTab('catatan')" class="bg-slate-900 border border-slate-800 p-5 rounded-xl cursor-pointer hover:border-accent transition group shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-slate-400 font-medium">Catatan Tersimpan</span>
+                        <span class="text-accent text-xs opacity-0 group-hover:opacity-100 transition">Buka &rarr;</span>
+                    </div>
+                    <h3 id="dash-catatan" class="text-2xl font-bold text-white">0 Catatan</h3>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4">
+                <h3 class="font-bold text-lg text-white">Selamat Datang, Fabian! 👋</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                    Asisten pribadi digital kamu aktif dan terhubung langsung ke Google Spreadsheet. Klik salah satu ringkasan di atas untuk akses cepat atau pilih menu navigasi di samping.
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                    <button onclick="switchTab('jadwal')" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 py-2.5 px-3 rounded-lg border border-slate-700 transition flex items-center justify-center space-x-2">
+                        <span>📅</span><span>Jadwal Pelajaran</span>
+                    </button>
+                    <button onclick="switchTab('piket')" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 py-2.5 px-3 rounded-lg border border-slate-700 transition flex items-center justify-center space-x-2">
+                        <span>🧹</span><span>Jadwal Piket</span>
+                    </button>
+                    <button onclick="switchTab('kebiasaan')" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 py-2.5 px-3 rounded-lg border border-slate-700 transition flex items-center justify-center space-x-2">
+                        <span>✨</span><span>Rutinitas</span>
+                    </button>
+                    <button onclick="switchTab('keuangan')" class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 py-2.5 px-3 rounded-lg border border-slate-700 transition flex items-center justify-center space-x-2">
+                        <span>💰</span><span>Catat Keuangan</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: TUGAS SEKOLAH -->
+        <section id="tab-tugas" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                <h3 class="font-bold text-white mb-4">Tambah Tugas Baru</h3>
+                <form id="form-tugas" onsubmit="handleTugasSubmit(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <input type="text" id="tugas-nama" placeholder="Nama tugas..." required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="tugas-mapel" placeholder="Mata Pelajaran..." required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="date" id="tugas-tenggat" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <select id="tugas-prioritas" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="Tinggi">Prioritas: Tinggi</option>
+                        <option value="Sedang" selected>Prioritas: Sedang</option>
+                        <option value="Rendah">Prioritas: Rendah</option>
+                    </select>
+                    <button type="submit" class="bg-accent text-white font-medium text-sm rounded-lg py-2 hover:bg-blue-600 transition">Simpan Tugas</button>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800 font-bold text-white text-sm">Daftar Tugas (Sheet: Tugas)</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/40">
+                                <th class="p-3">Nama Tugas</th>
+                                <th class="p-3">Mata Pelajaran</th>
+                                <th class="p-3">Tenggat Waktu</th>
+                                <th class="p-3">Prioritas</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-tugas-body" class="divide-y divide-slate-800">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data dari Spreadsheet...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: JADWAL PELAJARAN -->
+        <section id="tab-jadwal" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                <h3 class="font-bold text-white mb-4">Tambah Jadwal Pelajaran</h3>
+                <form id="form-jadwal" onsubmit="handleJadwalSubmit(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3">
+                    <select id="jadwal-hari" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="Senin">Senin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option>
+                    </select>
+                    <input type="text" id="jadwal-jam" placeholder="Jam (cth: 07:00)" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="jadwal-mapel" placeholder="Mata Pelajaran" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="jadwal-ruangan" placeholder="Ruangan" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="jadwal-guru" placeholder="Nama Guru" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <button type="submit" class="bg-accent text-white font-medium text-sm rounded-lg py-2 hover:bg-blue-600 transition">Tambah</button>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800 font-bold text-white text-sm">Jadwal Pelajaran (Sheet: Jadwal pelajaran)</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/40">
+                                <th class="p-3">Hari</th>
+                                <th class="p-3">Jam</th>
+                                <th class="p-3">Mata Pelajaran</th>
+                                <th class="p-3">Ruangan</th>
+                                <th class="p-3">Guru</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-jadwal-body" class="divide-y divide-slate-800">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data dari Spreadsheet...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: JADWAL PIKET -->
+        <section id="tab-piket" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                <h3 class="font-bold text-white mb-4">Tambah Anggota Piket</h3>
+                <form id="form-piket" onsubmit="handlePiketSubmit(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <select id="piket-hari" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="Senin">Senin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option>
+                    </select>
+                    <input type="text" id="piket-anggota" placeholder="Anggota Kebersihan..." required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="piket-tugas" placeholder="Tugas Piket (cth: Menyapu)" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <select id="piket-status" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="Belum">Belum</option><option value="Selesai">Selesai</option>
+                    </select>
+                    <button type="submit" class="bg-accent text-white font-medium text-sm rounded-lg py-2 hover:bg-blue-600 transition">Simpan Piket</button>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800 font-bold text-white text-sm">Jadwal Piket Kelas (Sheet: Jadwal Piket)</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/40">
+                                <th class="p-3">Hari</th>
+                                <th class="p-3">Anggota Kebersihan</th>
+                                <th class="p-3">Tugas Piket</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-piket-body" class="divide-y divide-slate-800">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500">Memuat data dari Spreadsheet...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: KEBIASAAN / RUTINITAS -->
+        <section id="tab-kebiasaan" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                <h3 class="font-bold text-white mb-4">Tambah Kebiasaan / Rutinitas</h3>
+                <form id="form-kebiasaan" onsubmit="handleKebiasaanSubmit(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <input type="text" id="kebiasaan-nama" placeholder="Nama Kebiasaan..." required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="kebiasaan-target" placeholder="Target Harian (cth: 2 Liter)" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="number" id="kebiasaan-streak" placeholder="Streak (Hari)" value="0" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <select id="kebiasaan-status" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="Aktif">Aktif</option><option value="Selesai">Selesai</option>
+                    </select>
+                    <button type="submit" class="bg-accent text-white font-medium text-sm rounded-lg py-2 hover:bg-blue-600 transition">Simpan Rutinitas</button>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800 font-bold text-white text-sm">Rutinitas & Kebiasaan (Sheet: Kebiasaan)</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/40">
+                                <th class="p-3">Nama Kebiasaan</th>
+                                <th class="p-3">Target Harian</th>
+                                <th class="p-3">Streak Harian</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-kebiasaan-body" class="divide-y divide-slate-800">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500">Memuat data dari Spreadsheet...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: KEUANGAN -->
+        <section id="tab-keuangan" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                <h3 class="font-bold text-white mb-4">Catat Keuangan</h3>
+                <form id="form-keuangan" onsubmit="handleKeuanganSubmit(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3">
+                    <input type="date" id="keu-tanggal" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <select id="keu-tipe" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="pemasukan">Pemasukan</option>
+                        <option value="pengeluaran">Pengeluaran</option>
+                    </select>
+                    <input type="text" id="keu-kategori" placeholder="Kategori (cth: Uang Saku)" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="number" id="keu-jumlah" placeholder="Jumlah (Rp)" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="keu-keterangan" placeholder="Keterangan..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    <button type="submit" class="bg-accent text-white font-medium text-sm rounded-lg py-2 hover:bg-blue-600 transition">Simpan</button>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800 font-bold text-white text-sm flex justify-between items-center">
+                    <span>Riwayat Keuangan (Sheet: Keuangan)</span>
+                    <span id="saldo-box" class="text-success font-bold">Total Saldo: Rp 0</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/40">
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">Tipe</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Jumlah</th>
+                                <th class="p-3">Keterangan</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-keuangan-body" class="divide-y divide-slate-800">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data dari Spreadsheet...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: CATATAN & TODO -->
+        <section id="tab-catatan" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
+                <h3 class="font-bold text-white mb-4">Buat Catatan Baru</h3>
+                <form id="form-catatan" onsubmit="handleCatatanSubmit(event)" class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input type="text" id="catatan-judul" placeholder="Judul Catatan..." required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <input type="date" id="catatan-tanggal" required class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                    </div>
+                    <textarea id="catatan-isi" placeholder="Tulis isi catatan atau daftar tugas di sini..." rows="3" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent"></textarea>
+                    <button type="submit" class="bg-accent text-white font-medium text-sm rounded-lg px-5 py-2 hover:bg-blue-600 transition">Simpan Catatan</button>
+                </form>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800 font-bold text-white text-sm">Daftar Catatan (Sheet: Catatan)</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/40">
+                                <th class="p-3">Judul</th>
+                                <th class="p-3">Isi Catatan</th>
+                                <th class="p-3">Tanggal Dibuat</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-catatan-body" class="divide-y divide-slate-800">
+                            <tr><td colspan="4" class="p-4 text-center text-slate-500">Memuat data dari Spreadsheet...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Integrasi Google Apps Script -->
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxLKn1fnTi5UxTcqLRwZw_g2cBaO3uqZfIrdMZty1wQ2ZQCqrGDHwYOZr07rMvRPaKZ9w/exec";
+        let appData = {};
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', options);
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            if(document.getElementById('tugas-tenggat')) document.getElementById('tugas-tenggat').value = todayStr;
+            if(document.getElementById('keu-tanggal')) document.getElementById('keu-tanggal').value = todayStr;
+            if(document.getElementById('catatan-tanggal')) document.getElementById('catatan-tanggal').value = todayStr;
+
+            loadAllDataFromSheet();
+        });
+
+        function toggleMobileMenu(forceClose = false) {
+            const sidebar = document.getElementById('sidebar-nav');
+            const overlay = document.getElementById('menu-overlay');
+            if (forceClose === true) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('aside nav button').forEach(btn => {
+                btn.classList.remove('bg-accent', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:bg-slate-800', 'hover:text-white');
+            });
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-accent', 'text-white');
+                activeBtn.classList.remove('text-slate-400', 'hover:bg-slate-800', 'hover:text-white');
+            }
+
+            const titles = {
+                'dashboard': 'Ringkasan Utama',
+                'tugas': 'Tugas Sekolah',
+                'jadwal': 'Jadwal Pelajaran',
+                'piket': 'Jadwal Piket Kelas',
+                'kebiasaan': 'Rutinitas & Kebiasaan',
+                'keuangan': 'Manajemen Keuangan',
+                'catatan': 'Catatan & Todo List'
+            };
+            document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function loadAllDataFromSheet() {
+            setSyncStatus(true, "Menyelaraskan...");
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                appData = data;
+                renderAllTables();
+                setSyncStatus(false, "Sinkron");
+            } catch (error) {
+                console.error("Gagal memuat data:", error);
+                setSyncStatus(false, "Gagal Sinkron");
+            }
+        }
+
+        function setSyncStatus(isLoading, text) {
+            const el = document.getElementById('sync-status');
+            if(isLoading) {
+                el.innerHTML = `<span class="w-2 h-2 rounded-full bg-accent animate-ping"></span><span>${text}</span>`;
+            } else {
+                el.innerHTML = `<span class="w-2 h-2 rounded-full bg-success"></span><span>${text}</span>`;
+            }
+        }
+
+        async function sendDataToSheet(sheetName, rowArray) {
+            setSyncStatus(true, "Menyimpan...");
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "add", sheet: sheetName, row: rowArray })
+                });
+                setTimeout(() => { loadAllDataFromSheet(); }, 2500);
+            } catch (error) {
+                console.error("Gagal mengirim data:", error);
+                setSyncStatus(false, "Error Simpan");
+            }
+        }
+
+        async function deleteDataFromSheet(sheetName, rowIndex) {
+    // Mencegah baris header (index 0) terhapus secara tidak sengaja
+    if (rowIndex < 0) {
+        alert("Header tidak dapat dihapus!");
+        return;
+    }
+
+    if(!confirm("Yakin ingin menghapus baris data ini?")) return;
+    setSyncStatus(true, "Menghapus...");
+    
+    try {
+        await fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ 
+                action: "delete", 
+                sheet: sheetName, 
+                // Karena baris 1 adalah header di spreadsheet, data baris ke-1 array ada di baris ke-2 spreadsheet
+                rowIndex: rowIndex + 1 
+            })
+        });
+        setTimeout(() => { loadAllDataFromSheet(); }, 2500);
+    } catch (error) {
+        console.error("Gagal menghapus:", error);
+        setSyncStatus(false, "Error Hapus");
+    }
+}
+
+        function renderAllTables() {
+            // 1. TUGAS
+            const tugasList = appData["Tugas"] || [];
+            let htmlTugas = "";
+            let uncompletedTugas = 0;
+            if(tugasList.length === 0) {
+                htmlTugas = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Belum ada data tugas.</td></tr>`;
+            } else {
+                tugasList.forEach((item, idx) => {
+                    let status = item["Status"] || item["status"] || "";
+                    if(status !== "Selesai") uncompletedTugas++;
+                    htmlTugas += `<tr class="hover:bg-slate-800/50">
+                        <td class="p-3 font-medium text-white">${item["Nama tugas"] || item["nama tugas"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Mata Pelajaran"] || item["mata pelajaran"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Tenggat waktu"] || item["tenggat waktu"] || ''}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-blue-950 text-accent font-medium">${item["Prioritas"] || item["prioritas"] || ''}</span></td>
+                        <td class="p-3 text-slate-300">${status || 'Belum'}</td>
+                        <td class="p-3 text-center"><button onclick="deleteDataFromSheet('Tugas', ${idx})" class="text-rose-400 hover:text-rose-300 text-xs bg-slate-800 px-2.5 py-1 rounded">Hapus</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('table-tugas-body').innerHTML = htmlTugas;
+            document.getElementById('dash-tugas').innerText = `${uncompletedTugas} Tugas`;
+
+            // 2. JADWAL PELAJARAN
+            const jadwalList = appData["Jadwal pelajaran"] || [];
+            let htmlJadwal = "";
+            if(jadwalList.length === 0) {
+                htmlJadwal = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Belum ada jadwal pelajaran.</td></tr>`;
+            } else {
+                jadwalList.forEach((item, idx) => {
+                    htmlJadwal += `<tr class="hover:bg-slate-800/50">
+                        <td class="p-3 font-medium text-white">${item["Hari"] || item["hari"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Jam"] || item["jam"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Mata Pelajaran"] || item["mata pelajaran"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Ruangan"] || item["ruangan"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Guru"] || item["guru"] || ''}</td>
+                        <td class="p-3 text-center"><button onclick="deleteDataFromSheet('Jadwal pelajaran', ${idx})" class="text-rose-400 hover:text-rose-300 text-xs bg-slate-800 px-2.5 py-1 rounded">Hapus</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('table-jadwal-body').innerHTML = htmlJadwal;
+
+            // 3. JADWAL PIKET
+            const piketList = appData["Jadwal Piket"] || [];
+            let htmlPiket = "";
+            if(piketList.length === 0) {
+                htmlPiket = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Belum ada data piket.</td></tr>`;
+            } else {
+                piketList.forEach((item, idx) => {
+                    htmlPiket += `<tr class="hover:bg-slate-800/50">
+                        <td class="p-3 font-medium text-white">${item["Hari"] || item["hari"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Anggota Kebarsi"] || item["anggota kebarsi"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Tugas Piket"] || item["tugas piket"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Status"] || item["status"] || ''}</td>
+                        <td class="p-3 text-center"><button onclick="deleteDataFromSheet('Jadwal Piket', ${idx})" class="text-rose-400 hover:text-rose-300 text-xs bg-slate-800 px-2.5 py-1 rounded">Hapus</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('table-piket-body').innerHTML = htmlPiket;
+
+            // 4. KEBIASAAN
+            const kebiasaanList = appData["Kebiasaan"] || [];
+            let htmlKebiasaan = "";
+            if(kebiasaanList.length === 0) {
+                htmlKebiasaan = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Belum ada data rutinitas.</td></tr>`;
+            } else {
+                kebiasaanList.forEach((item, idx) => {
+                    htmlKebiasaan += `<tr class="hover:bg-slate-800/50">
+                        <td class="p-3 font-medium text-white">${item["Nama Kebiasaa"] || item["nama kebiasaa"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Target Harian"] || item["target harian"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Streak Harian"] || item["streak harian"] || ''} Hari</td>
+                        <td class="p-3 text-slate-300">${item["Status"] || item["status"] || ''}</td>
+                        <td class="p-3 text-center"><button onclick="deleteDataFromSheet('Kebiasaan', ${idx})" class="text-rose-400 hover:text-rose-300 text-xs bg-slate-800 px-2.5 py-1 rounded">Hapus</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('table-kebiasaan-body').innerHTML = htmlKebiasaan;
+
+            // 5. KEUANGAN (Disesuaikan dengan huruf besar/kecil di Header Spreadsheet)
+            const keuanganList = appData["Keuangan"] || [];
+            let htmlKeu = "";
+            let totalSaldo = 0;
+            if(keuanganList.length === 0) {
+                htmlKeu = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Belum ada transaksi keuangan.</td></tr>`;
+            } else {
+                keuanganList.forEach((item, idx) => {
+                    let rawTanggal = item["tanggal"] || item["Tanggal"] || "";
+                    let rawTipe = item["tipe"] || item["Tipe"] || "";
+                    let rawKategori = item["kategori"] || item["Kategori"] || "";
+                    let rawJumlah = item["jumlah"] || item["Jumlah"] || 0;
+                    let rawKeterangan = item["keterangan"] || item["Keterangan"] || "";
+
+                    let nominal = parseFloat(String(rawJumlah).replace(/[^0-9.-]+/g,"")) || 0;
+                    let tipe = String(rawTipe).trim().toLowerCase();
+                    
+                    if(tipe === "pemasukan") {
+                        totalSaldo += nominal;
+                    } else if(tipe === "pengeluaran") {
+                        totalSaldo -= nominal;
+                    }
+
+                    // Format tanggal bersih (mengambil YYYY-MM-DD jika berbentuk ISO string)
+                    let tanggalBersih = String(rawTanggal).split('T')[0];
+                    
+                    htmlKeu += `<tr class="hover:bg-slate-800/50">
+                        <td class="p-3 text-slate-300">${tanggalBersih}</td>
+                        <td class="p-3 font-medium ${tipe === 'pemasukan' ? 'text-success' : 'text-slate-400'}">${rawTipe}</td>
+                        <td class="p-3 text-slate-300">${rawKategori}</td>
+                        <td class="p-3 font-medium text-white">Rp ${nominal.toLocaleString('id-ID')}</td>
+                        <td class="p-3 text-slate-400">${rawKeterangan}</td>
+                        <td class="p-3 text-center"><button onclick="deleteDataFromSheet('Keuangan', ${idx})" class="text-rose-400 hover:text-rose-300 text-xs bg-slate-800 px-2.5 py-1 rounded">Hapus</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('table-keuangan-body').innerHTML = htmlKeu;
+            const saldoFormatted = `Rp ${totalSaldo.toLocaleString('id-ID')}`;
+            document.getElementById('dash-saldo').innerText = saldoFormatted;
+            document.getElementById('saldo-box').innerText = `Total Saldo: ${saldoFormatted}`;
+
+            // 6. CATATAN
+            const catatanList = appData["Catatan"] || [];
+            let htmlCatatan = "";
+            if(catatanList.length === 0) {
+                htmlCatatan = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Belum ada catatan.</td></tr>`;
+            } else {
+                catatanList.forEach((item, idx) => {
+                    let tglCatatan = String(item["Tanggal Dibuat"] || item["tanggal dibuat"] || "").split('T')[0];
+                    htmlCatatan += `<tr class="hover:bg-slate-800/50">
+                        <td class="p-3 font-medium text-white">${item["Judul"] || item["judul"] || ''}</td>
+                        <td class="p-3 text-slate-300">${item["Isi Catatan"] || item["isi catatan"] || ''}</td>
+                        <td class="p-3 text-slate-400">${tglCatatan}</td>
+                        <td class="p-3 text-center"><button onclick="deleteDataFromSheet('Catatan', ${idx})" class="text-rose-400 hover:text-rose-300 text-xs bg-slate-800 px-2.5 py-1 rounded">Hapus</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('table-catatan-body').innerHTML = htmlCatatan;
+            document.getElementById('dash-catatan').innerText = `${catatanList.length} Catatan`;
+        }
+
+        // Form Submit Handlers
+        function handleTugasSubmit(e) {
+            e.preventDefault();
+            sendDataToSheet("Tugas", [
+                document.getElementById('tugas-nama').value,
+                document.getElementById('tugas-mapel').value,
+                document.getElementById('tugas-tenggat').value,
+                document.getElementById('tugas-prioritas').value,
+                "Belum"
+            ]);
+            document.getElementById('form-tugas').reset();
+        }
+
+        function handleJadwalSubmit(e) {
+            e.preventDefault();
+            sendDataToSheet("Jadwal pelajaran", [
+                document.getElementById('jadwal-hari').value,
+                document.getElementById('jadwal-jam').value,
+                document.getElementById('jadwal-mapel').value,
+                document.getElementById('jadwal-ruangan').value,
+                document.getElementById('jadwal-guru').value
+            ]);
+            document.getElementById('form-jadwal').reset();
+        }
+
+        function handlePiketSubmit(e) {
+            e.preventDefault();
+            sendDataToSheet("Jadwal Piket", [
+                document.getElementById('piket-hari').value,
+                document.getElementById('piket-anggota').value,
+                document.getElementById('piket-tugas').value,
+                document.getElementById('piket-status').value
+            ]);
+            document.getElementById('form-piket').reset();
+        }
+
+        function handleKebiasaanSubmit(e) {
+            e.preventDefault();
+            sendDataToSheet("Kebiasaan", [
+                document.getElementById('kebiasaan-nama').value,
+                document.getElementById('kebiasaan-target').value,
+                document.getElementById('kebiasaan-streak').value,
+                document.getElementById('kebiasaan-status').value
+            ]);
+            document.getElementById('form-kebiasaan').reset();
+        }
+
+        function handleKeuanganSubmit(e) {
+            e.preventDefault();
+            sendDataToSheet("Keuangan", [
+                document.getElementById('keu-tanggal').value,
+                document.getElementById('keu-tipe').value,
+                document.getElementById('keu-kategori').value,
+                document.getElementById('keu-jumlah').value,
+                document.getElementById('keu-keterangan').value
+            ]);
+            document.getElementById('form-keuangan').reset();
+        }
+
+        function handleCatatanSubmit(e) {
+            e.preventDefault();
+            sendDataToSheet("Catatan", [
+                document.getElementById('catatan-judul').value,
+                document.getElementById('catatan-isi').value,
+                document.getElementById('catatan-tanggal').value
+            ]);
+            document.getElementById('form-catatan').reset();
+        }
+    </script>
+</body>
+</html>
